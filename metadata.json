@@ -1,0 +1,7 @@
+{
+  "name": "K-Daycare OS Enterprise",
+  "description": "Premium SaaS for Ontario Childcare Management with AI Compliance Auditing.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

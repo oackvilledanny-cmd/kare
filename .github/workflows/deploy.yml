@@ -1,0 +1,60 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  # SERVICE_NAME: k-daycare-os
+  SERVICE_NAME: k-daycare-os-enterprise
+  REGION: us-central1
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Log in to Google Cloud
+      # Option 1: Using Service Account Key JSON (simplest for beginners)
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      # Setup gcloud CLI
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      # Configure Docker to use gcloud command-line tool as a credential helper
+      - name: Configure Docker
+        run: |
+          gcloud auth configure-docker
+
+      # Build the Docker image
+      - name: Build
+        run: |
+          docker build -t gcr.io/$PROJECT_ID/$SERVICE_NAME:${{ github.sha }} .
+
+      # Push the Docker image to Google Container Registry
+      - name: Push
+        run: |
+          docker push gcr.io/$PROJECT_ID/$SERVICE_NAME:${{ github.sha }}
+
+      # Deploy to Cloud Run
+      - name: Deploy
+        run: |
+          gcloud run deploy $SERVICE_NAME \
+            --image gcr.io/$PROJECT_ID/$SERVICE_NAME:${{ github.sha }} \
+            --region $REGION \
+            --platform managed \
+            --allow-unauthenticated \
+            --set-env-vars VITE_GEMINI_API_KEY=${{ secrets.VITE_GEMINI_API_KEY }}

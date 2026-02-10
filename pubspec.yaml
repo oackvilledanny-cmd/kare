@@ -1,0 +1,21 @@
+
+name: daycare_os
+description: A comprehensive SaaS platform for daycare centers in Ontario, Canada.
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.5.1
+  dio: ^5.4.3
+  flutter_secure_storage: ^9.0.0
+  google_generative_ai: ^0.4.0
+  fl_chart: ^0.66.0
+  intl: ^0.19.0
+  google_fonts: ^6.2.1
+
+flutter:
+  uses-material-design: true
