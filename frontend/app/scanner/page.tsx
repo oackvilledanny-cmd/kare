@@ -20,7 +20,7 @@ export default function ScannerPage() {
         <tbody>
           {data?.top10?.map((x: any) => (
             <tr key={x.ticker}>
-              <td><Link href={`/symbol/${x.ticker}`}>{x.ticker}</Link></td>
+              <td><Link href={`/symbol?ticker=${encodeURIComponent(x.ticker)}`}>{x.ticker}</Link></td>
               <td>{x.shock_days}</td>
               <td>{x.score}</td>
               <td>{x.reasons?.join(', ')}</td>

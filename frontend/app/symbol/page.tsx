@@ -1,22 +1,25 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 
 const API = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000'
 
-export default function SymbolPage({ params }: { params: { ticker: string } }) {
+export default function SymbolPage() {
+  const search = useSearchParams()
+  const ticker = useMemo(() => search.get('ticker') || 'SHOP.TO', [search])
   const [chart, setChart] = useState<any>(null)
   const [ind, setInd] = useState<any>(null)
   const [news, setNews] = useState<any>(null)
 
   useEffect(() => {
-    fetch(`${API}/api/symbol/${params.ticker}/chart`).then(r => r.json()).then(setChart)
-    fetch(`${API}/api/symbol/${params.ticker}/indicators`).then(r => r.json()).then(setInd)
-    fetch(`${API}/api/symbol/${params.ticker}/news`).then(r => r.json()).then(setNews)
-  }, [params.ticker])
+    fetch(`${API}/api/symbol/${ticker}/chart`).then(r => r.json()).then(setChart)
+    fetch(`${API}/api/symbol/${ticker}/indicators`).then(r => r.json()).then(setInd)
+    fetch(`${API}/api/symbol/${ticker}/news`).then(r => r.json()).then(setNews)
+  }, [ticker])
 
   return (
     <section className="page">
-      <h2>{params.ticker} Detail</h2>
+      <h2>{ticker} Detail</h2>
       <p>Not financial advice. Educational only.</p>
       <div className="card">
         <h3>Indicators</h3>

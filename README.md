@@ -12,8 +12,8 @@ This repository implements an end-to-end MVP for:
 - Daily-bar backtest with simple entry/exit simulation
 
 Architecture:
-- `frontend/`: Next.js app, intended for Firebase Hosting
-- `backend/`: FastAPI service for Cloud Run
+- `frontend/`: Next.js static export app deployed to Firebase Hosting
+- `backend/`: FastAPI service deployed to Cloud Run
 - `infra/`: deployment scripts
 - `scripts/`: one-command deploy orchestration
 
@@ -76,7 +76,7 @@ Methods:
 - Market data provider abstraction in `backend/app/providers/base.py`
 - Current MVP provider: `yfinance`
 - News provider abstraction ready; default mock implementation
-- Do not hardcode API keys. Use Secret Manager (Cloud Run env vars) or Firebase Functions config if adding key-based providers.
+- Do not hardcode API keys. Use **Google Secret Manager + Cloud Run env vars** for paid providers.
 
 ## 5) Local run
 ### Backend
@@ -104,18 +104,30 @@ Includes:
 - unit tests for indicators/scoring
 - minimal e2e scan -> weights flow using FastAPI TestClient
 
-## 7) Deployment
+## 7) Production deployment (Cloud Run + Firebase Hosting)
+> You can deploy this as a service. The scripts below are the intended production path.
+
+### Prerequisites
+```bash
+gcloud auth login
+gcloud config set project <gcp-project>
+gcloud auth application-default login
+npm i -g firebase-tools
+firebase login
+```
+
 ### Backend to Cloud Run
 ```bash
 PROJECT_ID=<gcp-project> REGION=northamerica-northeast1 ./infra/cloudrun_deploy.sh
 ```
 
-### Frontend to Firebase Hosting
+### Frontend to Firebase Hosting (static export)
 ```bash
 cd frontend
 npm install
 NEXT_PUBLIC_API_BASE=<cloud-run-url> npm run build
-npx firebase-tools deploy --only hosting
+cd ..
+firebase deploy --project <firebase-project> --only hosting
 ```
 
 ### One-command deploy
